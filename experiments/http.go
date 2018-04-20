@@ -2,21 +2,43 @@ package experiments
 
 import (
 	"net/http"
-	"log"
 	"fmt"
+	"io/ioutil"
+	"net/url"
 )
 
 func Http() {
-	url := "https://httpbin.org/post"
-	ct := "application/json"
-	body := "{\"form\": {\"custname\": \"aaa\"}}"
+	//get()
+	post()
+}
 
-	rst, err := http.Post(url, ct, body)
+func get() {
+	u := "https://httpbin.org/get"
+
+	rsp, err := http.Get(u)
 	if err != nil {
-		log.Println("Error!", err)
+		panic(err)
 	}
 
-	fmt.Println("-- Response --")
-	fmt.Println("Status Code:", rst.StatusCode)
-	fmt.Println("Body:", rst.Body)
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
+
+	fmt.Println("get:\n", string(body))
+}
+
+
+func post() {
+	u := "https://httpbin.org/post"
+	//ct := "application/json"
+	//body := "{\"form\": {\"custname\": \"aaa\"}}"
+
+	rsp, err := http.PostForm(u, url.Values{"q": {"custname"}})
+	if err != nil {
+		panic(err)
+	}
+
+	defer rsp.Body.Close()
+	body, err := ioutil.ReadAll(rsp.Body)
+
+	fmt.Println("post:\n", string(body))
 }
